@@ -6,29 +6,39 @@ import {
     faHome,
     faList,
     faRightFromBracket,
-    faXmark,
+    faGear,
     faSquareCheck,
 } from "@fortawesome/free-solid-svg-icons";
 
-const Sidebar = () => {
+const SidebarAgent = () => {
     // const [showSidebar, setShowSidebar] = useState(true);
 
     const menus = [
         {
             name: "Dashboard",
-            to: "/customer/home",
+            to: "/agent/dashboard",
             icon: faHome,
         },
         {
-            name: "Create Ticket",
-            to: "/customer/ticket/create",
+            name: "Ticket",
+            to: "/agent/ticket",
             icon: faList,
         },
         {
             name: "Board",
-            to: "/customer/board",
+            to: "/agent/board",
             icon: faSquareCheck,
-        }
+        },
+        {
+            name: "Report",
+            to: "/agent/report",
+            icon: faFlag,
+        },
+        {
+            name: "Settings",
+            to: "/agent/settings",
+            icon: faGear,
+        },
     ];
 
     return (
@@ -59,4 +69,4 @@ const Sidebar = () => {
     );
 };
 
-export default Sidebar;
+export default SidebarAgent;

@@ -1,17 +1,17 @@
-// roleModels.js
 import { Sequelize } from "sequelize";
 import db from "../config/db.config.js";
+// import Tickets from "./ticketModels.js";
 
 const { DataTypes } = Sequelize;
 
-const Roles = db.define(
-    "roles",
+const TicketActivity = db.define(
+    "ticketActivity",
     {
-        roleName: {
+        activityType: {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
-                isIn: [["Customer", "Customer Service", "Administrator"]],
+                isIn: [["Not Started", "In Progress", "Done"]],
                 notEmpty: true,
             },
         },
@@ -21,8 +21,14 @@ const Roles = db.define(
     }
 );
 
+// TicketActivity.belongsTo(Tickets,{
+//     foreignKey: "ticketId",
+//     targetKey: "id",
+//     allowNull: false
+// })
+
 (async () => {
     await db.sync();
 })();
 
-export default Roles;
+export default TicketActivity;

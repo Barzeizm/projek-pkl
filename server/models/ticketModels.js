@@ -1,6 +1,9 @@
 import { Sequelize } from "sequelize";
 import db from "../config/db.config.js";
 import Users from "./userModel.js";
+import Comment from "./commentModels.js";
+import TicketActivity from "./ticketActivityModels.js";
+import TicketStatus from "./ticketStatusModels.js";
 
 const { DataTypes } = Sequelize;
 
@@ -21,26 +24,34 @@ const Tickets = db.define(
                 notEmpty: true,
             },
         },
-        status: {
-            type: DataTypes.ENUM("Not Started", "In Progress", "Done"),
+        priority: {
+            type: DataTypes.ENUM("Low", "Medium", "High", "Critically"),
             allowNull: true,
             validate: {
                 notEmpty: false,
             },
         },
-        priority: {
-            type: DataTypes.ENUM("Low", "Medium", "High", "Critically"),
+        assignee: {
+            type: DataTypes.STRING,
             allowNull: false,
             validate: {
                 notEmpty: true,
             },
         },
-        userId: {
-            type: DataTypes.INTEGER,
+        createdBy: {
+            type: DataTypes.STRING,
             allowNull: false,
             validate: {
                 notEmpty: true,
             },
+        },
+        activityType: {
+            type: DataTypes.ENUM("Not Started", "In Progress", "Done"),
+            allowNull: true,
+        },
+        statusType: {
+            type: DataTypes.ENUM("Open", "Closed", "Warning"),
+            allowNull: true,
         },
     },
     {
@@ -48,22 +59,23 @@ const Tickets = db.define(
     }
 );
 
+// Define associations after all models are defined
 Tickets.belongsTo(Users, {
-    foreignKey: "userId",
-    targetKey: "id",
+    foreignKey: "assignee",
+    targetKey: "email",
     allowNull: false,
+});
+
+Tickets.hasMany(Comment, {
+    foreignKey: "ticketId",
+    onDelete: "CASCADE",
+});
+Comment.belongsTo(Tickets, {
+    foreignKey: "ticketId",
 });
 
 (async () => {
     await db.sync();
 })();
-
-// db.sync()
-//     .then(() => {
-//         console.log("Database synced!");
-//     })
-//     .catch((err) => {
-//         console.error("Error syncing database:", err);
-//     });
 
 export default Tickets;

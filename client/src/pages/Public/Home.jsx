@@ -15,7 +15,7 @@ const Home = () => {
                 </div>
                 <div className='flex items-center gap-4'>
                     <NavLink to='/register' className='flex items-center justify-center text-white hover:bg-blue-950 w-24 h-10'>
-                        Register
+                        Join Us
                     </NavLink>
                     <NavLink to='/login' className='flex items-center justify-center text-white hover:bg-blue-950 w-24 h-10'>
                         Login

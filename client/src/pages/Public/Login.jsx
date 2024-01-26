@@ -19,13 +19,21 @@ const Login = () => {
             });
 
             // Assuming the server sends a token upon successful login
-            const { token } = response.data;
+            const { token,roleId } = response.data;
 
             // You can store the token in localStorage or session storage
             // For example, to store it in localStorage:
             localStorage.setItem("token", token);
 
-            navigate("/home");
+            if (roleId === 1) {
+                navigate("/customer/home");
+            } else if (roleId === 2) {
+                navigate("/agent/dashboard");
+            } else {
+                // Handle other roles or show an error message
+                console.error("Unsupported role:", roleId);
+            }
+            console.log(token,roleId,email)
             // Redirect or perform any other actions upon successful login
             toast.success("🦄 Wow so easy!", {
                 position: "top-center",

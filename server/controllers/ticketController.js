@@ -2,11 +2,13 @@ import { Sequelize } from "sequelize";
 import db from "../config/db.config.js";
 import Tickets from "../models/ticketModels.js";
 import Users from "../models/userModel.js";
+import TicketActivity from "../models/ticketActivityModels.js";
+import TicketStatus from "../models/ticketStatusModels.js";
 
 export const getAllTickets = async (req, res) => {
     try {
         const response = await Tickets.findAll({
-            include: [{ model: Users, attributes: ["email"], required: true, }],
+            include: [{ model: Users, attributes: ["email"], required: true }],
         });
         res.status(200).json(response);
     } catch (error) {
@@ -14,18 +16,28 @@ export const getAllTickets = async (req, res) => {
     }
 };
 
-//ticketControllers.js
-export const createTickets = async (req, res) => {
-    const { title, description, status, priority, userId } = req.body;
+export const getTicketById = async (req, res) => {
+    try {
+        const response = await Tickets.findOne({ where: { id: req.params.id } });
+        res.status(200).json(response);
+    } catch (error) {
+        console.log(error.message);
+    }
+};
+
+
+export const createTicket = async (req, res) => {
+    const { title, description, assignee, activityType, statusType, createdBy } = req.body;
 
     try {
         // Create a new ticket with assigneeId set to user's id
         const newTicket = await Tickets.create({
             title,
             description,
-            status,
-            priority,
-            userId: userId,
+            assignee,
+            createdBy,
+            statusType: statusType,
+            activityType: activityType,
         });
 
         // Include assigneeEmail in the response
@@ -41,25 +53,55 @@ export const createTickets = async (req, res) => {
     }
 };
 
+export const updateTicket = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title, description, priority, userId, activityType, statusType } = req.body;
+
+        // Cek apakah ticket dengan id yang diberikan ada
+        const ticket = await Tickets.findByPk(id);
+        if (!ticket) {
+            return res.status(404).json({ message: "Ticket not found" });
+        }
+
+        // Lakukan update hanya untuk field yang diberikan (gunakan spread operator)
+
+        // Ambil data ticket setelah diupdate
+        const updatedTicket = {
+            title: title,
+            description: description,
+            priority: priority,
+            userId: userId,
+            activityType: activityType,
+            statusType: statusType,
+        };
+
+        await ticket.update(updatedTicket);
+
+        res.json(updatedTicket);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
 
 export const deleteTicket = async (req, res) => {
     try {
         const { id } = req.params;
-    
+
         // Check if the user exists
         const ticket = await Tickets.findByPk(id);
-    
+
         if (!ticket) {
-          return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({ message: "User not found" });
         }
-    
+
         // Delete the user
         await ticket.destroy();
-    
-        res.status(200).json({ message: 'User deleted successfully' });
-      } catch (error) {
+
+        res.status(200).json({ message: "User deleted successfully" });
+    } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Internal Server Error' });
-      }
-    
-}
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};

@@ -4,13 +4,15 @@ import {
     createUsers,
     updateUsers,
     deleteUsers,
-    loginUser
+    Login,
+    getProfile
 } from "../controllers/userController.js"
 
 const router = express.Router()
 
 router.post('/signup', createUsers);
-router.post('/login', loginUser);
+router.post('/login', Login);
+router.get('/profile', getProfile);
 router.get('/users', getAllUsers);
 router.patch('/users/edit/:id', updateUsers)
 router.delete('/users/delete/:id', deleteUsers)

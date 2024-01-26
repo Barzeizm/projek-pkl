@@ -1,17 +1,16 @@
-// roleModels.js
 import { Sequelize } from "sequelize";
 import db from "../config/db.config.js";
 
 const { DataTypes } = Sequelize;
 
-const Roles = db.define(
-    "roles",
+const TicketStatus = db.define(
+    "ticketStatus",
     {
-        roleName: {
+        status: {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
-                isIn: [["Customer", "Customer Service", "Administrator"]],
+                isIn: [["Open", "Closed", "Warning"]],
                 notEmpty: true,
             },
         },
@@ -25,4 +24,4 @@ const Roles = db.define(
     await db.sync();
 })();
 
-export default Roles;
+export default TicketStatus;

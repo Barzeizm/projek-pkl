@@ -13,8 +13,10 @@ const saltRounds = process.env.SALT_ROUNDS ? parseInt(process.env.SALT_ROUNDS, 1
 
 export const getAllUsers = async (req, res) => {
     try {
-        const response = await Users.findAll();
-        res.status(200).json(response); 
+        const response = await Users.findAll({
+            include : [{ model: Roles, attributes: ["roleName"], required: true }]
+        });
+        res.status(200).json(response);
     } catch (error) {
         console.log(error.message);
     }
@@ -71,42 +73,84 @@ export const createUsers = async (req, res) => {
     }
 };
 
-export const loginUser = async (req, res) => {
+export const Login = async (req, res) => {
     try {
-        // Extract user credentials from the request body
-        const { email, password } = req.body;
-
-        // Find the user by email in the Users table
-        const user = await Users.findOne({
-            where: { email },
-        });
-
-        // If the user is not found, return an authentication failed response
-        if (!user) {
-            return res.status(401).json({ message: "Authentication failed. User not found." });
-        }
-
-        // Compare the provided password with the hashed password stored in the database
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-
-        // If the password is not valid, return an authentication failed response
-        if (!isPasswordValid) {
-            return res.status(401).json({ message: "Authentication failed. Invalid password." });
-        }
-
-        // Create and sign a JWT token with user's email and set expiration time
-        const token = jwt.sign({ email: user.email, userId: user.id }, secretKey, {
-            expiresIn: "1h", // Token expires in 1 hour
-        });
-
-        // Send a successful response with the generated token and status code 200
-        res.status(200).json({ message: "Authentication successful", token, email });
+      // Extract user credentials from the request body
+      const { email, password } = req.body;
+  
+      // Find the user by email in the Users table
+      const user = await Users.findOne({
+        where: { email },
+      });
+  
+      // If the user is not found, return an authentication failed response
+      if (!user) {
+        return res.status(401).json({ message: "Authentication failed. User not found." });
+      }
+  
+      // Compare the provided password with the hashed password stored in the database
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+  
+      // If the password is not valid, return an authentication failed response
+      if (!isPasswordValid) {
+        return res.status(401).json({ message: "Authentication failed. Invalid password." });
+      }
+  
+      // Fetch user's role
+      const { roleId,username } = user;
+  
+      // Create and sign a JWT token with user's email, userId, and roleId, and set expiration time
+      const token = jwt.sign({ email: user.email, userId: user.id, roleId, username ,password}, secretKey, {
+        expiresIn: "1h", // Token expires in 1 hour
+      });
+  
+      // Send a login message based on the roleId
+      let message = "";
+      if (roleId === 1) {
+        message = "You are logged in as a user.";
+      } else if (roleId === 2) {
+        message = "You are logged in as an admin.";
+      }
+  
+      // Send a successful response with the generated token, message, email, and roleId
+      res.status(200).json({ message, token, email, username,password, roleId });
     } catch (error) {
-        // Log any errors and send an error response with status code 500
-        console.error(error);
-        res.status(500).json({ message: "Internal Server Error" });
+      // Log any errors and send an error response with status code 500
+      console.error(error);
+      res.status(500).json({ message: "Internal Server Error" });
     }
-};
+  };
+  
+  export const getProfile = async (req, res) => {
+    try {
+      // Extract the token from the request headers
+      const token = req.headers.authorization?.split(" ")[1];
+  
+      // Verify and decode the token
+      const decodedToken = jwt.verify(token, secretKey);
+  
+      // Extract the user ID from the decoded token
+      const id = decodedToken.id;
+  
+      // Find the user by ID in the Users table
+      const user = await Users.findByPk(id, {
+        attributes: { exclude: ["password"] },
+      });
+  
+      // If the user is not found, return a not found response
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      // Send the user profile in the response
+      res.status(200).json({ user });
+    } catch (error) {
+      // Log any errors and send an error response with status code 500
+      console.error(error);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  };
+
 
 export const updateUsers = async (req, res) => {
     try {
@@ -138,21 +182,20 @@ export const updateUsers = async (req, res) => {
 export const deleteUsers = async (req, res) => {
     try {
         const { id } = req.params;
-    
+
         // Check if the user exists
         const user = await Users.findByPk(id);
-    
+
         if (!user) {
-          return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({ message: "User not found" });
         }
-    
+
         // Delete the user
         await user.destroy();
-    
-        res.status(200).json({ message: 'User deleted successfully' });
-      } catch (error) {
+
+        res.status(200).json({ message: "User deleted successfully" });
+    } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Internal Server Error' });
-      }
-    
-}
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};

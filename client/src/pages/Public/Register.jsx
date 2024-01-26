@@ -48,7 +48,7 @@ const Register = () => {
             setUsername("");
             setEmail("");
             setPassword("");
-            toast.success("🦄 Wow so easy!", {
+            toast.success("Registrasi Berhasil", {
                 position: "top-center",
                 autoClose: 3000,
                 hideProgressBar: false,
@@ -57,7 +57,6 @@ const Register = () => {
                 draggable: true,
                 theme: "light",
             });
-            navigate("/login");
         } catch (error) {
             if (error.response) {
                 toast.warning("Registrasi Gagal", {
@@ -100,6 +99,15 @@ const Register = () => {
                                 onFocus={() => setUserFocus(true)}
                                 onBlur={() => setUserFocus(false)}
                             />
+                            <p
+                                className={
+                                    userFocus && username && !validUsername
+                                        ? " text-red-600"
+                                        : "invisible absolute left-[999rem]"
+                                }
+                            >
+                                Username tidak valid
+                            </p>
                         </div>
                         <div className=''>
                             <label className='block text-gray-700 text-sm font-bold mb-2'>
@@ -118,7 +126,15 @@ const Register = () => {
                                 onFocus={() => setEmailFocus(true)}
                                 onBlur={() => setEmailFocus(false)}
                             />
-                           
+                            <p
+                                className={
+                                    emailFocus && email && !validEmail
+                                        ? " text-red-600"
+                                        : "invisible absolute left-[999rem]"
+                                }
+                            >
+                                Username tidak valid
+                            </p>
                         </div>
                         <div className=''>
                             <label className='block text-gray-700 text-sm font-bold mb-2'>
@@ -137,6 +153,15 @@ const Register = () => {
                                 onFocus={() => setPasswordFocus(true)}
                                 onBlur={() => setPasswordFocus(false)}
                             />
+                            <p
+                                className={
+                                    passwordFocus && password && !validPassword
+                                        ? " text-red-600"
+                                        : "invisible absolute left-[999rem]"
+                                }
+                            >
+                                Username tidak valid
+                            </p>
                         </div>
                         <button
                             onClick={handleSubmit}

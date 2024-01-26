@@ -6,13 +6,10 @@ import { NavLink } from "react-router-dom";
 const Header = () => {
     const [dropDown, setDropDown] = useState(false);
     const [userEmail, setUserEmail] = useState("");
+    const [userId, setUserId] = useState("");
+    const [role, setRole] = useState("");
 
     const dropdownMenus = [
-        {
-            name: "Profile",
-            to: "/profile",
-            icon: faUser,
-        },
         {
             name: "Logout",
             to: "/logout",
@@ -29,11 +26,26 @@ const Header = () => {
             const decodedToken = JSON.parse(atob(token.split(".")[1]));
 
             // Extract email from decoded token
-            const { email } = decodedToken;
+            const { email, userId } = decodedToken;
 
             setUserEmail(email);
+            setUserId(userId);
         }
     }, []);
+    // useEffect(() => {
+    //     // Retrieve the token from localStorage
+    //     const token = localStorage.getItem("token");
+
+    //     // Decode the token to get user information
+    //     if (token) {
+    //         const decodedToken = JSON.parse(atob(token.split(".")[1]));
+
+    //         // Extract email from decoded token
+    //         const { role } = decodedToken;
+
+    //         setRole(role);
+    //     }
+    // }, []);
 
     return (
         <>
@@ -43,7 +55,7 @@ const Header = () => {
             </div> */}
             <div className='bg-blue-500 py-4 px-6 text-black flex items-center justify-end absolute top-0 left-56 right-0 bottom-0 h-[5rem]'>
                 <div className='flex items-center gap-2 pr-10'>
-                    <div className="text-white">{userEmail}</div>
+                    <div className='text-white'>{userEmail}</div>
                     <FontAwesomeIcon
                         icon={faChevronDown}
                         className={`${
@@ -65,7 +77,6 @@ const Header = () => {
                                         <div>
                                             <FontAwesomeIcon icon={item.icon} />
                                         </div>
-
                                         <div className='w-40'>{item.name}</div>
                                     </NavLink>
                                 </div>
